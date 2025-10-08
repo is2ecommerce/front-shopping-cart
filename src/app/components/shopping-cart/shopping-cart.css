@@ -1,0 +1,11 @@
+:host{ display:block; color:#fff; }
+
+/* animación al montar filas (suave) */
+:host ::ng-deep .row .panel { transition: transform .2s ease, box-shadow .2s ease; }
+
+/* tarjetas/elementos toman un poco de profundidad al entrar */
+:host ::ng-deep .panel .py-3{ animation: slideUp .24s ease both; }
+@keyframes slideUp{ from{ transform: translateY(6px); opacity:.0 } to{ transform: translateY(0); opacity:1 } }
+
+/* accesibilidad foco */
+:host ::ng-deep .icon-btn:focus, .btn-gradient:focus { outline: 2px solid var(--ring); outline-offset: 2px; }
