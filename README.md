@@ -57,3 +57,53 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+Docker — cómo arrancar desde Docker
+
+Producción (SSR)
+
+ Construir la imagen
+ ```bash
+docker build -t front-shopping-cart:latest .
+```
+
+Arrancar el contenedor (puerto 4040)
+```bash
+docker run --rm -p 4040:4040 --name front-shopping-cart front-shopping-cart:latest
+```
+ Si usas otro puerto (por ejemplo, 8080)
+ ```bash
+docker run -e PORT=8080 -p 8080:8080 front-shopping-cart:latest
+```
+
+ Desarrollo (ng serve)
+
+
+Construir la imagen dev
+```bash
+docker build -f Dockerfile.dev -t front-shopping-cart:dev .
+```
+
+Arrancar el contenedor dev (puerto 4300)
+```bash
+docker run --rm -p 4300:4300 --name front-shopping-cart-dev front-shopping-cart:dev
+```
+
+ Con live-reload (montar el código como volumen)
+```bash
+docker run --rm -p 4300:4300 \
+	-v "$(pwd)":/app \
+	-v /app/node_modules \
+	--name front-shopping-cart-dev front-shopping-cart:dev
+```
+
+ 
+ Comandos útiles
+ 
+```bash
+docker images                                          # Listar imágenes
+docker image rm front-shopping-cart:dev                # Borrar imagen dev
+docker tag front-shopping-cart:dev front-shopping-cart:latest  # Retag
+docker ps -a --format 'table {{.ID}}\t{{.Names}}\t{{.Status}}\t{{.Ports}}'  # Listar contenedores
+docker logs -f <container-name-or-id>                  # Ver logs en tiempo real
+```
