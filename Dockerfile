@@ -21,5 +21,5 @@ RUN npm ci --omit=dev --no-audit --no-fund
 
 
 COPY --from=build /app/dist ./dist
-EXPOSE 4000
+EXPOSE 4040
 CMD ["node", "dist/shopping-cart/server/server.mjs"]
