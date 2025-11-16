@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
-import { CommonModule, DecimalPipe } from '@angular/common';
+import { Component, signal, effect, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, DecimalPipe, isPlatformBrowser } from '@angular/common';
+import { Router } from '@angular/router';
 
 type CartItem = {
   id: number;
@@ -8,7 +9,6 @@ type CartItem = {
   qty: number;
   img: string;
   meta?: string[]; // chips como "Color: Black"
-  fav?: boolean;
 };
 
 @Component({
@@ -19,6 +19,31 @@ type CartItem = {
   styleUrls: ['./shopping-cart.css']
 })
 export class ShoppingCartComponent {
+  // Signal para controlar el tema (false = claro, true = oscuro)
+  isDarkTheme = signal(false);
+
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private router: Router
+  ) {
+    // Effect para sincronizar el tema con el wrapper principal de la app
+    // Solo se ejecuta en el navegador, no en SSR
+    effect(() => {
+      if (isPlatformBrowser(this.platformId)) {
+        const appBg = document.querySelector('.app-bg');
+        if (appBg) {
+          if (this.isDarkTheme()) {
+            appBg.classList.remove('theme-light');
+            appBg.classList.add('theme-dark');
+          } else {
+            appBg.classList.remove('theme-dark');
+            appBg.classList.add('theme-light');
+          }
+        }
+      }
+    });
+  }
+  
   items: CartItem[] = [
     {
       id: 1, title: 'Wireless Bluetooth Headphones', price: 89.99, qty: 1,
@@ -37,21 +62,48 @@ export class ShoppingCartComponent {
     },
   ];
 
-  shipping = 0;     // FREE
-  taxRate  = 0.08;  // 8%
+  shippingCost = 15;  // Costo de envío
+  shipping = 15;      // Se actualiza dinámicamente
+  taxRate  = 0.08;    // 8%
+  
+  // Umbral para envío gratis
+  freeShippingThreshold = 250;
 
   get subtotal(): number { return this.items.reduce((s, i) => s + i.price * i.qty, 0); }
   get taxes(): number    { return +(this.subtotal * this.taxRate).toFixed(2); }
-  get total(): number    { return +(this.subtotal + this.shipping + this.taxes).toFixed(2); }
+  get total(): number    { 
+    // Actualizar shipping basado en si califica para envío gratis
+    this.shipping = this.hasFreeShipping ? 0 : this.shippingCost;
+    return +(this.subtotal + this.shipping + this.taxes).toFixed(2); 
+  }
+  
+  // Métodos para la barra de progreso del envío gratis
+  get freeShippingProgress(): number {
+    const progress = (this.subtotal / this.freeShippingThreshold) * 100;
+    return Math.min(progress, 100);
+  }
+  
+  get amountForFreeShipping(): number {
+    const remaining = this.freeShippingThreshold - this.subtotal;
+    return Math.max(remaining, 0);
+  }
+  
+  get hasFreeShipping(): boolean {
+    return this.subtotal >= this.freeShippingThreshold;
+  }
 
   inc(item: CartItem){ item.qty++; this.pulse(item.id); }
   dec(item: CartItem){ if (item.qty > 1) { item.qty--; this.pulse(item.id); } }
   remove(item: CartItem){ this.items = this.items.filter(i => i.id !== item.id); }
   clear(){ this.items = []; }
-  toggleFav(item: CartItem){ item.fav = !item.fav; }
 
   // Para *ngFor performance
   trackById = (_: number, it: CartItem) => it.id;
+
+  // Método para alternar entre tema claro y oscuro
+  toggleTheme() {
+    this.isDarkTheme.update(value => !value);
+  }
 
   // anima el chip de cantidad
   private pulse(id: number){
@@ -62,5 +114,8 @@ export class ShoppingCartComponent {
     el.classList.add('scale-in');
   }
 
-  secureCheckout(){ alert('🔒 Secure checkout demo'); }
+  secureCheckout() { 
+    // Navegar a la página de checkout
+    this.router.navigate(['/checkout']);
+  }
 }

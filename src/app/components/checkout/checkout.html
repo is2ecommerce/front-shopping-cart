@@ -1,0 +1,245 @@
+<div class="checkout-container">
+  <!-- Success Modal -->
+  @if (showSuccess()) {
+  <div class="success-modal">
+    <div class="success-content">
+      <div class="success-icon">✅</div>
+      <h2>¡Pago Exitoso!</h2>
+      <p>Tu pedido ha sido procesado correctamente</p>
+      <p class="order-number">Orden #{{ orderNumber }}</p>
+      <div class="spinner-redirect">
+        <div class="spinner"></div>
+        <p>Redirigiendo...</p>
+      </div>
+    </div>
+  </div>
+  }
+
+  <!-- Main Checkout -->
+  <div class="row g-4">
+    <!-- Left Column: Payment Form -->
+    <div class="col-lg-7">
+      <div class="panel p-4 p-md-5">
+        <!-- Header -->
+        <div class="d-flex align-items-center gap-3 mb-4">
+          <button class="back-btn" (click)="cancelCheckout()" aria-label="Volver al carrito">
+            ← 
+          </button>
+          <div>
+            <h2 class="h4 m-0">Pasarela de Pagos</h2>
+            <p class="text-soft small m-0">Completa tu información de pago</p>
+          </div>
+        </div>
+
+        <hr class="hr-soft my-4">
+
+        <!-- Payment Methods -->
+        <div class="mb-4">
+          <label class="form-label fw-semibold mb-3">Método de Pago</label>
+          <div class="payment-methods">
+            <button 
+              class="payment-method-btn"
+              [class.active]="selectedPaymentMethod() === 'credit-card'"
+              (click)="selectPaymentMethod('credit-card')">
+              <span class="payment-icon">💳</span>
+              <span>Tarjeta de Crédito</span>
+            </button>
+            <button 
+              class="payment-method-btn"
+              [class.active]="selectedPaymentMethod() === 'debit-card'"
+              (click)="selectPaymentMethod('debit-card')">
+              <span class="payment-icon">🏦</span>
+              <span>Tarjeta de Débito</span>
+            </button>
+            <button 
+              class="payment-method-btn"
+              [class.active]="selectedPaymentMethod() === 'paypal'"
+              (click)="selectPaymentMethod('paypal')">
+              <span class="payment-icon">🅿️</span>
+              <span>PayPal</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Credit/Debit Card Form -->
+        @if (selectedPaymentMethod() === 'credit-card' || selectedPaymentMethod() === 'debit-card') {
+        <div>
+          <form class="payment-form">
+            <!-- Card Number -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Número de Tarjeta</label>
+              <input 
+                type="text" 
+                class="form-control"
+                placeholder="1234 5678 9012 3456"
+                [(ngModel)]="cardNumber"
+                (input)="formatCardNumber($event)"
+                [name]="'cardNumber'"
+                maxlength="19"
+                required>
+              <div class="card-brands mt-2">
+                <span class="card-brand">Visa</span>
+                <span class="card-brand">Mastercard</span>
+                <span class="card-brand">Apple Pay</span>
+              </div>
+            </div>
+
+            <!-- Cardholder Name -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Nombre del Titular</label>
+              <input 
+                type="text" 
+                class="form-control"
+                placeholder="NOMBRE APELLIDO"
+                [(ngModel)]="cardName"
+                [name]="'cardName'"
+                required>
+            </div>
+
+            <!-- Expiry & CVV -->
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label fw-semibold">Fecha de Expiración</label>
+                <input 
+                  type="text" 
+                  class="form-control"
+                  placeholder="MM/YY"
+                  [(ngModel)]="expiryDate"
+                  (input)="formatExpiryDate($event)"
+                  [name]="'expiryDate'"
+                  maxlength="5"
+                  required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label fw-semibold">CVV</label>
+                <input 
+                  type="text" 
+                  class="form-control"
+                  placeholder="123"
+                  [(ngModel)]="cvv"
+                  [name]="'cvv'"
+                  maxlength="4"
+                  required>
+              </div>
+            </div>
+
+            <!-- Email -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Correo Electrónico</label>
+              <input 
+                type="email" 
+                class="form-control"
+                placeholder="tu@email.com"
+                [(ngModel)]="email"
+                [name]="'email'"
+                required>
+              <small class="text-soft">Recibirás la confirmación de tu pedido</small>
+            </div>
+          </form>
+        </div>
+        }
+
+        <!-- PayPal Form -->
+        @if (selectedPaymentMethod() === 'paypal') {
+        <div>
+          <div class="paypal-section">
+            <div class="paypal-icon-large">🅿️</div>
+            <h3 class="h5">Pagar con PayPal</h3>
+            <p class="text-soft">Serás redirigido a PayPal para completar tu pago de forma segura</p>
+            
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Correo Electrónico de PayPal</label>
+              <input 
+                type="email" 
+                class="form-control"
+                placeholder="tu@paypal.com"
+                [(ngModel)]="email"
+                [name]="'paypalEmail'"
+                required>
+            </div>
+          </div>
+        </div>
+        }
+
+        <!-- Security Badge -->
+        <div class="security-badge mt-4">
+          <span class="security-icon">🔒</span>
+          <span class="small text-soft">Pago seguro y encriptado SSL/TLS</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Order Summary -->
+    <div class="col-lg-5">
+      <div class="panel p-4">
+        <h3 class="h5 mb-3">Resumen del Pedido</h3>
+        
+        <div class="order-item mb-3">
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-soft">Subtotal ({{orderSummary.itemCount}} items)</span>
+            <span class="fw-semibold">${{orderSummary.subtotal | number:'1.2-2'}}</span>
+          </div>
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-soft">Envío</span>
+            @if (orderSummary.shipping === 0) {
+            <span class="fw-semibold text-success">GRATIS</span>
+            } @else {
+            <span class="fw-semibold">${{orderSummary.shipping | number:'1.2-2'}}</span>
+            }
+          </div>
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-soft">Impuestos</span>
+            <span class="fw-semibold">${{orderSummary.tax | number:'1.2-2'}}</span>
+          </div>
+        </div>
+
+        <hr class="hr-soft my-3">
+
+        <div class="d-flex justify-content-between mb-4">
+          <span class="h6 m-0">Total</span>
+          <span class="h5 m-0 price-lg">${{orderSummary.total | number:'1.2-2'}}</span>
+        </div>
+
+        <!-- Payment Button -->
+        <button 
+          class="btn btn-gradient w-100 py-3 fw-semibold"
+          [disabled]="isProcessing()"
+          (click)="processPayment()">
+          @if (!isProcessing()) {
+          <span>
+            🔒 Completar Pago - ${{orderSummary.total | number:'1.2-2'}}
+          </span>
+          } @else {
+          <span>
+            <span class="spinner-small"></span>
+            Procesando...
+          </span>
+          }
+        </button>
+
+        <button 
+          class="btn btn-outline-light w-100 mt-2"
+          (click)="cancelCheckout()"
+          [disabled]="isProcessing()">
+          Cancelar
+        </button>
+
+        <!-- Trust Badges -->
+        <div class="trust-badges mt-4">
+          <div class="trust-item">
+            <span>✅</span>
+            <small>Garantía de devolución</small>
+          </div>
+          <div class="trust-item">
+            <span>🚚</span>
+            <small>Envío seguro</small>
+          </div>
+          <div class="trust-item">
+            <span>🔐</span>
+            <small>Pago protegido</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

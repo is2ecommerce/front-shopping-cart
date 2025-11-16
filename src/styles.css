@@ -247,3 +247,84 @@ html, body{
 
 /* Si el markup trae .text-white, forzamos oscuro en tema claro */
 .theme-light .text-white{ color:#111 !important; }
+
+/* =========================================================
+   Tema Oscuro
+   Aplica en el wrapper: <div class="app-bg theme-dark">...</div>
+   ========================================================= */
+.theme-dark{
+  --surface:   rgba(255,255,255,.08);
+  --surface-2: rgba(255,255,255,.12);
+  --ring:      rgba(255,255,255,.45);
+  color-scheme: dark;
+  color: #fff;
+}
+
+.theme-dark .app-bg{
+  background:
+    radial-gradient(1100px 520px at 95% -10%, rgba(0,126,185,.20), transparent 60%),
+    radial-gradient(900px 500px  at -10%  10%, rgba(72,163,198,.18), transparent 55%),
+    linear-gradient(160deg, var(--amz-navy), var(--amz-slate), #1a232b);
+}
+
+.theme-dark .bg-dot{
+  opacity: .20;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23fff' fill-opacity='0.06'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+.theme-dark .blob{
+  opacity: .7;
+  mix-blend-mode: multiply;
+  filter: blur(26px);
+}
+
+.theme-dark .panel{
+  background: var(--surface);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,.10);
+  box-shadow: 0 20px 60px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.06);
+  color: #fff;
+}
+
+.theme-dark .hr-soft{ border-color: rgba(255,255,255,.12); }
+.theme-dark .text-soft{ color: rgba(255,255,255,.85); }
+.theme-dark .btn-gradient{ color:#111; }
+
+.theme-dark .shimmer{ background: var(--surface-2); }
+.theme-dark .shimmer--blue{ background: color-mix(in oklab, var(--amz-sky) 22%, transparent); }
+
+.theme-dark .badge-soft{
+  background: rgba(255,255,255,.12);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,.18);
+}
+
+.theme-dark .bg-brand-sky   { background: var(--amz-sky)   !important; color:#0b2030 !important; }
+.theme-dark .bg-brand-blue  { background: var(--amz-blue)  !important; color:#fff     !important; }
+.theme-dark .bg-brand-orange{ background: var(--amz-orange)!important; color:#111     !important; }
+
+.theme-dark .icon-btn{
+  background: rgba(255,255,255,.12);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,.18);
+}
+.theme-dark .icon-btn:hover{ background: rgba(255,255,255,.18); }
+
+.theme-dark .qty-chip{
+  background: rgba(255,255,255,.14);
+  border: 1px solid rgba(255,255,255,.18);
+  color: #fff;
+}
+
+.theme-dark .price-lg{ color: #fff; }
+
+.theme-dark .btn-outline-light{
+  color:#fff; border-color:rgba(255,255,255,.18); background:rgba(255,255,255,.08);
+}
+.theme-dark .btn-outline-light:hover{
+  background:rgba(255,255,255,.16); color:#fff; border-color:rgba(255,255,255,.25);
+}
+
+.theme-dark .text-white{ color:#fff !important; }
+

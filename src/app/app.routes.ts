@@ -1,3 +1,9 @@
 import { Routes } from '@angular/router';
+import { ShoppingCartComponent } from './components/shopping-cart/shopping-cart';
+import { CheckoutComponent } from './components/checkout/checkout';
 
-export const routes: Routes = [];
+export const routes: Routes = [
+  { path: '', component: ShoppingCartComponent },
+  { path: 'checkout', component: CheckoutComponent },
+  { path: '**', redirectTo: '' }
+];

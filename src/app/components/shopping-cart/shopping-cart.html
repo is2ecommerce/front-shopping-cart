@@ -2,21 +2,63 @@
   <!-- Col izquierda: lista de items -->
   <div class="col-lg-8">
     <div class="panel p-4 p-md-5 lift">
-      <div class="d-flex align-items-center gap-3 mb-3">
-        <div class="d-inline-flex align-items-center justify-content-center rounded-3"
-             style="width:44px;height:44px;background:rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.10);">
-          🛍️
-        </div>
-        <div>
-          <h2 class="h4 m-0">Shopping Cart</h2>
-          <div class="small text-soft">
-            {{items.length}} items &nbsp; ✨
-            <span class="badge-soft badge rounded-pill">Premium Experience</span>
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <div class="d-flex align-items-center gap-3">
+          <div class="d-inline-flex align-items-center justify-content-center rounded-3"
+               style="width:44px;height:44px;background:rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.10);">
+            🛍️
+          </div>
+          <div>
+            <h2 class="h4 m-0">Shopping Cart</h2>
+            <div class="small text-soft">
+              {{items.length}} items &nbsp; ✨
+              <span class="badge-soft badge rounded-pill">Premium Experience</span>
+            </div>
           </div>
         </div>
+        
+        <!-- Botón para cambiar tema -->
+        <button class="theme-toggle-btn" 
+                (click)="toggleTheme()" 
+                [attr.aria-label]="isDarkTheme() ? 'Switch to light theme' : 'Switch to dark theme'"
+                [title]="isDarkTheme() ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'">
+          <span class="theme-icon">{{ isDarkTheme() ? '☀️' : '🌙' }}</span>
+        </button>
       </div>
 
       <hr class="hr-soft my-4">
+
+      <!-- Barra de progreso para envío gratis -->
+      <div class="free-shipping-banner mb-4">
+        @if (!hasFreeShipping) {
+        <div class="shipping-progress-container">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <div class="d-flex align-items-center gap-2">
+              <span class="shipping-icon">🚚</span>
+              <span class="fw-semibold">Envío</span>
+            </div>
+            <span class="shipping-cost">${{ shippingCost | number:'1.2-2' }}</span>
+          </div>
+          <div class="progress-bar-container">
+            <div class="progress-bar-fill" [style.width.%]="freeShippingProgress"></div>
+          </div>
+          <p class="shipping-text mt-2 mb-0">
+            Agrega <strong>${{ amountForFreeShipping | number:'1.2-2' }}</strong> más para envío gratis
+          </p>
+        </div>
+        } @else {
+        <div class="shipping-achieved">
+          <div class="d-flex align-items-center gap-2">
+            <span class="shipping-icon">🚚</span>
+            <span class="fw-semibold">Envío</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <span class="fw-bold free-badge">GRATIS</span>
+            <span class="success-icon">✅</span>
+          </div>
+        </div>
+        }
+      </div>
 
       <div *ngFor="let it of items; trackBy: trackById; let last = last" class="py-3">
         <div class="d-flex gap-3 align-items-start">
@@ -28,9 +70,6 @@
               <div class="fw-semibold">{{ it.title }}</div>
 
               <div class="d-flex align-items-center gap-2">
-                <button class="icon-btn" (click)="toggleFav(it)" [attr.aria-pressed]="it.fav" title="Add to favorites">
-                  {{ it.fav ? '❤️' : '🤍' }}
-                </button>
                 <button class="icon-btn" (click)="remove(it)" aria-label="Remove" title="Remove">✖</button>
               </div>
             </div>
@@ -74,11 +113,17 @@
         <h3 class="h5 m-0">Order Summary</h3>
       </div>
 
-      <!-- Banner shimmer azul (paleta Amazon) -->
+      <!-- Banner de envío dinámico -->
+      @if (hasFreeShipping) {
       <div class="shimmer shimmer--blue p-3 mb-3 d-flex align-items-center gap-2">
         🚚 <span class="small">You qualify for free shipping!</span>
         <span class="badge bg-brand-sky ms-auto">FREE</span>
       </div>
+      } @else {
+      <div class="shipping-info-banner p-3 mb-3 d-flex align-items-center gap-2">
+        🚚 <span class="small">Add ${{ amountForFreeShipping | number:'1.2-2' }} more for free shipping</span>
+      </div>
+      }
 
       <div class="d-flex justify-content-between text-soft mb-1">
         <span>Subtotal</span>
@@ -86,7 +131,11 @@
       </div>
       <div class="d-flex justify-content-between text-soft mb-1">
         <span>Shipping</span>
+        @if (hasFreeShipping) {
         <span class="badge bg-brand-sky">FREE</span>
+        } @else {
+        <strong>${{ shipping | number:'1.2-2' }}</strong>
+        }
       </div>
       <div class="d-flex justify-content-between text-soft mb-3">
         <span>Tax</span>

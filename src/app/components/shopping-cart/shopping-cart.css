@@ -1,11 +1,254 @@
-:host{ display:block; color:#fff; }
+:host{ display:block; }
 
 /* animación al montar filas (suave) */
-:host ::ng-deep .row .panel { transition: transform .2s ease, box-shadow .2s ease; }
+:host ::ng-deep .row .panel { 
+  transition: transform .2s ease, box-shadow .2s ease;
+}
 
 /* tarjetas/elementos toman un poco de profundidad al entrar */
-:host ::ng-deep .panel .py-3{ animation: slideUp .24s ease both; }
-@keyframes slideUp{ from{ transform: translateY(6px); opacity:.0 } to{ transform: translateY(0); opacity:1 } }
+:host ::ng-deep .panel .py-3{ 
+  animation: slideUp .24s ease both; 
+}
+
+@keyframes slideUp{ 
+  from{ transform: translateY(6px); opacity:.0 } 
+  to{ transform: translateY(0); opacity:1 } 
+}
+
+/* Responsive: mejor espaciado en móviles */
+@media (max-width: 768px) {
+  :host ::ng-deep .panel {
+    padding: 1.5rem !important;
+  }
+  
+  :host ::ng-deep .panel img {
+    width: 60px !important;
+    height: 60px !important;
+  }
+  
+  :host ::ng-deep .price-lg {
+    font-size: 1.125rem;
+  }
+}
 
 /* accesibilidad foco */
-:host ::ng-deep .icon-btn:focus, .btn-gradient:focus { outline: 2px solid var(--ring); outline-offset: 2px; }
+:host ::ng-deep .icon-btn:focus, 
+:host ::ng-deep .btn-gradient:focus { 
+  outline: 2px solid #3b82f6; 
+  outline-offset: 2px; 
+}
+
+/* ========================================
+   BOTÓN DE CAMBIO DE TEMA
+   ======================================== */
+:host ::ng-deep .theme-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all .25s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+  border: none;
+  background: transparent;
+}
+
+/* Estilos del botón en tema claro */
+:host ::ng-deep .theme-light .theme-toggle-btn {
+  background: rgba(0,0,0,.06);
+  border: 1px solid rgba(0,0,0,.10);
+}
+
+:host ::ng-deep .theme-light .theme-toggle-btn:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 12px rgba(0,0,0,.15);
+  background: rgba(0,0,0,.10);
+}
+
+/* Estilos del botón en tema oscuro */
+:host ::ng-deep .theme-dark .theme-toggle-btn {
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.18);
+}
+
+:host ::ng-deep .theme-dark .theme-toggle-btn:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 12px rgba(255,255,255,.2);
+  background: rgba(255,255,255,.18);
+}
+
+:host ::ng-deep .theme-toggle-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+:host ::ng-deep .theme-toggle-btn .theme-icon {
+  font-size: 1.25rem;
+  transition: transform .3s ease;
+  display: inline-block;
+}
+
+:host ::ng-deep .theme-toggle-btn:hover .theme-icon {
+  transform: rotate(20deg);
+}
+
+/* ========================================
+   BARRA DE PROGRESO PARA ENVÍO GRATIS
+   ======================================== */
+.free-shipping-banner {
+  animation: slideDown .4s ease both;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.shipping-progress-container {
+  padding: 1rem 1.25rem;
+  border-radius: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+:host ::ng-deep .theme-light .shipping-progress-container {
+  background: rgba(255, 237, 213, 0.5);
+  border: 1px solid rgba(228, 121, 17, 0.2);
+}
+
+:host ::ng-deep .theme-dark .shipping-progress-container {
+  background: rgba(228, 121, 17, 0.1);
+  border: 1px solid rgba(228, 121, 17, 0.25);
+}
+
+.shipping-icon {
+  font-size: 1.25rem;
+}
+
+.shipping-cost {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+:host ::ng-deep .theme-light .shipping-cost {
+  color: #ea580c;
+}
+
+:host ::ng-deep .theme-dark .shipping-cost {
+  color: #fb923c;
+}
+
+.progress-bar-container {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+:host ::ng-deep .theme-light .progress-bar-container {
+  background: rgba(228, 121, 17, 0.15);
+}
+
+:host ::ng-deep .theme-dark .progress-bar-container {
+  background: rgba(228, 121, 17, 0.2);
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: #e47911;
+  border-radius: 4px;
+  transition: width 0.5s ease-out;
+}
+
+:host ::ng-deep .theme-light .progress-bar-fill {
+  background: linear-gradient(90deg, #ea580c, #f97316);
+}
+
+:host ::ng-deep .theme-dark .progress-bar-fill {
+  background: linear-gradient(90deg, #f97316, #fb923c);
+}
+
+.shipping-text {
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+:host ::ng-deep .theme-light .shipping-text {
+  color: #6b7280;
+}
+
+:host ::ng-deep .theme-dark .shipping-text {
+  color: #9ca3af;
+}
+
+/* Estado alcanzado - Envío gratis conseguido */
+.shipping-achieved {
+  padding: 1rem 1.25rem;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  animation: fadeIn 0.4s ease both;
+}
+
+:host ::ng-deep .theme-light .shipping-achieved {
+  background: rgba(220, 252, 231, 0.6);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+}
+
+:host ::ng-deep .theme-dark .shipping-achieved {
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.free-badge {
+  color: #16a34a;
+  font-size: 1rem;
+}
+
+:host ::ng-deep .theme-dark .free-badge {
+  color: #4ade80;
+}
+
+.success-icon {
+  font-size: 1.25rem;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ========================================
+   BANNER DE INFORMACIÓN DE ENVÍO (ORDER SUMMARY)
+   ======================================== */
+.shipping-info-banner {
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+}
+
+:host ::ng-deep .theme-light .shipping-info-banner {
+  background: rgba(255, 237, 213, 0.5);
+  border: 1px solid rgba(228, 121, 17, 0.2);
+  color: #6b7280;
+}
+
+:host ::ng-deep .theme-dark .shipping-info-banner {
+  background: rgba(228, 121, 17, 0.1);
+  border: 1px solid rgba(228, 121, 17, 0.25);
+  color: #9ca3af;
+}
+
