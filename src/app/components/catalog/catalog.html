@@ -1,0 +1,121 @@
+<div class="catalog-container">
+  <!-- Header -->
+  <header class="catalog-header">
+    <div class="header-content">
+      <h1>🛍️ Product Catalog</h1>
+      <div class="header-actions">
+        <button class="theme-toggle" (click)="toggleTheme()" title="Toggle theme">
+          <span *ngIf="!isDarkTheme()">🌙</span>
+          <span *ngIf="isDarkTheme()">☀️</span>
+        </button>
+        <button class="cart-button" (click)="goToCart()">
+          🛒 Cart
+          <span class="cart-badge" *ngIf="cartItemCount() > 0">{{ cartItemCount() }}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="filters-section">
+      <div class="search-box">
+        <input
+          type="text"
+          placeholder="Search products..."
+          [ngModel]="searchTerm()"
+          (ngModelChange)="searchTerm.set($event)"
+          (input)="onSearch()"
+          class="search-input"
+        />
+        <span class="search-icon">🔍</span>
+      </div>
+
+      <div class="category-filters">
+        <button
+          class="category-btn"
+          [class.active]="selectedCategory() === 'all'"
+          (click)="filterByCategory('all')"
+        >
+          All
+        </button>
+        <button
+          *ngFor="let category of categories()"
+          class="category-btn"
+          [class.active]="selectedCategory() === category"
+          (click)="filterByCategory(category)"
+        >
+          {{ category }}
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading()" class="loading-container">
+    <div class="spinner-large"></div>
+    <p>Loading products...</p>
+  </div>
+
+  <!-- Products Grid -->
+  <div *ngIf="!isLoading()" class="products-grid">
+    <div
+      *ngFor="let product of filteredProducts(); trackBy: trackById"
+      class="product-card"
+    >
+      <div class="product-image">
+        <img [src]="product.imageUrl" [alt]="product.name" />
+        <div class="product-badge" *ngIf="product.stock < 10">
+          Low Stock
+        </div>
+      </div>
+
+      <div class="product-info">
+        <div class="product-category">{{ product.category }}</div>
+        <h3 class="product-name">{{ product.name }}</h3>
+        <p class="product-description">{{ product.description }}</p>
+
+        <div class="product-meta" *ngIf="product.metadata && product.metadata.length > 0">
+          <span *ngFor="let meta of product.metadata" class="meta-chip">
+            {{ meta }}
+          </span>
+        </div>
+
+        <div class="product-rating" *ngIf="product.rating">
+          <span class="stars">
+            <span *ngFor="let star of [1,2,3,4,5]" class="star">
+              {{ star <= product.rating! ? '⭐' : '☆' }}
+            </span>
+          </span>
+          <span class="rating-value">{{ product.rating | number:'1.1-1' }}</span>
+        </div>
+
+        <div class="product-footer">
+          <div class="price-section">
+            <span class="price">${{ product.price | number:'1.2-2' }}</span>
+            <span class="stock-info">
+              {{ product.stock > 0 ? product.stock + ' in stock' : 'Out of stock' }}
+            </span>
+          </div>
+
+          <button
+            class="add-to-cart-btn"
+            (click)="addToCart(product)"
+            [disabled]="product.stock === 0"
+          >
+            <span *ngIf="product.stock > 0">Add to Cart 🛒</span>
+            <span *ngIf="product.stock === 0">Out of Stock</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading() && filteredProducts().length === 0" class="empty-state">
+    <div class="empty-icon">📦</div>
+    <h2>No products found</h2>
+    <p>Try adjusting your filters or search term</p>
+    <button class="reset-btn" (click)="filterByCategory('all'); searchTerm.set('')">
+      Reset Filters
+    </button>
+  </div>
+</div>

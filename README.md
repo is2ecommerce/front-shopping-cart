@@ -2,6 +2,67 @@
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.2.
 
+## 🏗️ Arquitectura de Microservicios
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                        KEYCLOAK                              │
+│              (API Gateway + Autenticación)                   │
+│                    Puerto: 8080                              │
+└──────────────────────┬──────────────────────────────────────┘
+                       │
+                       │ JWT Token Injection
+                       │
+        ┌──────────────┴──────────────┐
+        │                             │
+        ▼                             ▼
+┌───────────────────┐         ┌──────────────────┐
+│   FRONTEND        │         │    BACKEND       │
+│   Angular SPA     │◄────────┤  Shopping Cart   │
+│   Puerto: 4200    │  HTTP   │  Spring Boot     │
+│                   │         │  Puerto: 8080    │
+└───────────────────┘         └─────────┬────────┘
+                                        │
+                              ┌─────────┼─────────┐
+                              ▼         ▼         ▼
+                          ┌──────┐ ┌──────┐ ┌────────┐
+                          │Redis │ │RabbitMQ Catalog│
+                          │:6379 │ │:5672│  │Service │
+                          └──────┘ └──────┘ └────────┘
+```
+
+## 🚀 Quick Start
+
+### Opción 1: Usando npm scripts (Recomendado)
+
+```bash
+npm install
+npm start
+```
+
+### Opción 2: Usando Angular CLI directamente
+
+```bash
+npx ng serve
+```
+
+## 📡 Conexión con el Backend
+
+Este frontend se conecta al microservicio `back-shopping-cart`. Ver guías:
+
+- **Inicio Rápido**: [`QUICKSTART.md`](./QUICKSTART.md)
+- **Integración Completa**: [`MICROSERVICES_INTEGRATION.md`](./MICROSERVICES_INTEGRATION.md)
+
+### Endpoints del Backend
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/api/cart` | Obtener carrito |
+| POST | `/api/cart/items` | Agregar producto |
+| PUT | `/api/cart/items` | Actualizar cantidad |
+| DELETE | `/api/cart/items` | Eliminar producto |
+| POST | `/api/cart/checkout` | Procesar checkout |
+
 ## Development server
 
 To start a local development server, run:

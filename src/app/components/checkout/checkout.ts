@@ -2,6 +2,7 @@ import { Component, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { CartService } from '../../services/cart.service';
 
 type PaymentMethod = 'credit-card' | 'paypal' | 'debit-card';
 
@@ -17,6 +18,7 @@ export class CheckoutComponent implements OnInit {
   selectedPaymentMethod = signal<PaymentMethod>('credit-card');
   isProcessing = signal(false);
   showSuccess = signal(false);
+  errorMessage = signal<string | null>(null);
   
   // Form data
   cardNumber = '';
@@ -28,20 +30,47 @@ export class CheckoutComponent implements OnInit {
   // Para generar número de orden aleatorio
   orderNumber = '';
   
-  // Order summary (esto vendría del carrito en una app real)
+  // Order summary (cargado desde el carrito)
   orderSummary = {
-    subtotal: 199.96,
+    subtotal: 0,
     shipping: 0,
-    tax: 16.00,
-    total: 215.96,
-    itemCount: 3
+    tax: 0,
+    total: 0,
+    itemCount: 0
   };
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private cartService: CartService
+  ) {}
 
   ngOnInit() {
-    // Aquí podrías cargar los datos del carrito desde un servicio
+    // Cargar los datos del carrito desde el servicio
     this.orderNumber = Math.random().toString(36).substr(2, 9).toUpperCase();
+    this.loadCartSummary();
+  }
+  
+  /**
+   * Carga el resumen del carrito desde el backend
+   */
+  loadCartSummary() {
+    this.cartService.getCart().subscribe({
+      next: (cart) => {
+        if (cart && cart.items) {
+          this.orderSummary = {
+            subtotal: cart.subtotal || 0,
+            shipping: cart.shipping || 0,
+            tax: cart.tax || 0,
+            total: cart.total || 0,
+            itemCount: cart.items.reduce((sum, item) => sum + item.quantity, 0)
+          };
+        }
+      },
+      error: (error) => {
+        console.error('Error cargando resumen del carrito:', error);
+        this.errorMessage.set('No se pudo cargar el resumen del carrito');
+      }
+    });
   }
 
   selectPaymentMethod(method: PaymentMethod) {
@@ -70,17 +99,26 @@ export class CheckoutComponent implements OnInit {
     }
 
     this.isProcessing.set(true);
+    this.errorMessage.set(null);
 
-    // Simular procesamiento de pago
-    setTimeout(() => {
-      this.isProcessing.set(false);
-      this.showSuccess.set(true);
-      
-      // Redirigir al carrito después de 3 segundos
-      setTimeout(() => {
-        this.router.navigate(['/']);
-      }, 3000);
-    }, 2000);
+    // Llamar al backend para procesar el checkout
+    this.cartService.checkout().subscribe({
+      next: () => {
+        this.isProcessing.set(false);
+        this.showSuccess.set(true);
+        
+        // Redirigir al carrito después de 3 segundos
+        setTimeout(() => {
+          this.router.navigate(['/']);
+        }, 3000);
+      },
+      error: (error) => {
+        console.error('Error procesando pago:', error);
+        this.isProcessing.set(false);
+        this.errorMessage.set('Error al procesar el pago. Intenta nuevamente.');
+        alert('Error al procesar el pago. Por favor intenta nuevamente.');
+      }
+    });
   }
 
   validateForm(): boolean {
